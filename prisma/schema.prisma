@@ -23,7 +23,7 @@ model Product {
   updatedAt DateTime @updatedAt
 
   cartItems CartItem[]
-  // Ex: orderItems OrderItem[]
+  orderItems OrderItem[]
 }
 
 model Cart {
@@ -51,4 +51,43 @@ model CartItem {
   updatedAt DateTime @updatedAt
 
   @@unique([cartId, productId])
+}
+
+
+model Order {
+  id          String      @id @default(uuid())
+  totalAmount Float       // Valor total do pedido
+  status      OrderStatus @default(PENDING) // Status do pedido (usando um Enum)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  items       OrderItem[] // Itens do pedido
+
+  // userId    String?
+  // user      User?    @relation(fields: [userId], references: [id])
+
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  quantity  Int
+  price     Float   // Preço do produto NO MOMENTO DA COMPRA
+
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([orderId, productId]) // Um produto específico só aparece uma vez por pedido
+}
+
+// Enum para o status do pedido
+enum OrderStatus {
+  PENDING    // Pedido realizado, aguardando pagamento/processamento
+  PROCESSING // Pagamento confirmado, em processamento
+  SHIPPED    // Enviado
+  DELIVERED  // Entregue
+  CANCELED   // Cancelado
+  FAILED     // Falhou (ex: problema no pagamento)
 }

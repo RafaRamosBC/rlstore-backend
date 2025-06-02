@@ -18,7 +18,6 @@ async function bootstrap() {
     .setTitle('Sistema de Compras API')
     .setDescription('API para gerenciar produtos, carrinho e compras.')
     .setVersion('1.0')
-    .addTag('Produtos')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
