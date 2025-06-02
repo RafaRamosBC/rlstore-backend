@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Definição do modelo Product
+model Product {
+  id          String   @id @default(uuid()) // ID único universal
+  name        String
+  description String? // O '?' torna o campo opcional
+  price       Float    // Prisma usa Float para números decimais em SQLite
+  stock       Int      @default(0)
+  sku         String?  @unique // SKU opcional e único
+  imageUrl    String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos futuros podem ser adicionados aqui
+  // Ex: cartItems CartItem[]
+  // Ex: orderItems OrderItem[]
+}
