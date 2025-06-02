@@ -6,4 +6,4 @@ import { PrismaService } from './prisma.service';
     providers: [PrismaService],
     exports: [PrismaService], // Exporta para que possa ser injetado
 })
-export class PrismaCoreModule { } // Renomeado para PrismaCoreModule para clareza
+export class PrismaCoreModule { }
