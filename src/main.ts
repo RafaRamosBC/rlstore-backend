@@ -18,11 +18,13 @@ async function bootstrap() {
     .setTitle('Sistema de Compras API')
     .setDescription('API para gerenciar produtos, carrinho e compras.')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
-  console.log(`Application is running on: ${await app.getUrl()}/api`);
+  console.log(`Application is running on: ${await app.getUrl()}`); // Removi /api do log, pois é o path do Swagger UI
+  console.log(`Swagger UI is running on: ${await app.getUrl()}/api`);
 }
 bootstrap();
