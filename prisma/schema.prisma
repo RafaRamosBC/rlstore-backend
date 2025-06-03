@@ -33,7 +33,11 @@ model Cart {
   items     CartItem[] // Relação um-para-muitos com CartItem
 
   // Para um carrinho "anônimo" que pode expirar ou ser identificado por uma sessão
-  sessionId String? @unique // pode ser usado para identificar a sessão do "dono" do carrinho
+  sessionId String? @unique
+
+  // Relacionamento com User
+  userId    String?  @unique // Um carrinho pode pertencer a um usuário (opcional e único)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade) // Se o usuário for deletado, seu carrinho também.
 }
 
 model CartItem {
@@ -42,10 +46,7 @@ model CartItem {
   productId String // Chave estrangeira para Product
   product   Product @relation(fields: [productId], references: [id])
   cartId    String // Chave estrangeira para Cart
-  cart      Cart    @relation(fields: [cartId], references: [id])
-
-  // Armazenar o preço no momento da adição para consistência histórica
-  // priceAtAddition Float?
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade) // Se o carrinho for deletado, os itens também são.
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -63,8 +64,10 @@ model Order {
 
   items       OrderItem[] // Itens do pedido
 
-  // userId    String?
-  // user      User?    @relation(fields: [userId], references: [id])
+  // Relacionamento com User
+  userId    String? // Um pedido pode pertencer a um usuário
+  user      User?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull) // Se o usuário for deletado, o userId no pedido vira null.
+                                                                                                    // onUpdate: Cascade é para se o ID do usuário mudar.
 
 }
 
@@ -74,7 +77,7 @@ model OrderItem {
   price     Float   // Preço do produto NO MOMENTO DA COMPRA
 
   orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade) // Se o pedido for deletado, os itens também são.
 
   productId String
   product   Product @relation(fields: [productId], references: [id])
@@ -90,4 +93,18 @@ enum OrderStatus {
   DELIVERED  // Entregue
   CANCELED   // Cancelado
   FAILED     // Falhou (ex: problema no pagamento)
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique // Email deve ser único para login
+  name      String?
+  password  String   // Armazenar a senha hasheada
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações
+  cart      Cart?    // Um usuário pode ter um carrinho (opcional, relação um-para-um)
+  orders    Order[]  // Um usuário pode ter muitos pedidos
 }
